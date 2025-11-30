@@ -1,0 +1,21 @@
+# Default overrides for the Trade API (HTTP) service.
+
+global:
+  labels:
+    app.kubernetes.io/part-of: stocat
+    app.kubernetes.io/component: trade-api
+
+image:
+  repository: stocat/trade-api
+  tag: "0.0.1"
+
+containerPort: 8080
+
+service:
+  enabled: true
+  port: 8080
+
+env: []
+
+profiles:
+  active: ""

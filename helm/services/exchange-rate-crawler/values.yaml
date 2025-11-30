@@ -1,0 +1,21 @@
+# Default overrides for the Exchange Rate Crawler.
+
+global:
+  labels:
+    app.kubernetes.io/part-of: stocat
+    app.kubernetes.io/component: exchange-rate-crawler
+
+image:
+  repository: stocat/exchange-rate-crawler
+  tag: "0.0.1"
+
+containerPort: 8080
+
+service:
+  enabled: false
+  port: 8080
+
+env: []
+
+profiles:
+  active: ""
