@@ -17,8 +17,25 @@ ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/release
 # Copy application jar built by Gradle
 COPY build/libs/*.jar /app/app.jar
 
-# Enable the agent by default. Users can override JAVA_TOOL_OPTIONS if needed.
-ENV JAVA_TOOL_OPTIONS="-javaagent:/opt/otel/opentelemetry-javaagent.jar"
+ENV OTEL_AGENT_ENABLED=true
+
+RUN cat <<'EOF' >/entrypoint.sh
+#!/usr/bin/env sh
+set -e
+
+if [ "${OTEL_AGENT_ENABLED:-true}" = "true" ]; then
+  AGENT_OPTION="-javaagent:/opt/otel/opentelemetry-javaagent.jar"
+  if [ -n "${JAVA_TOOL_OPTIONS}" ]; then
+    export JAVA_TOOL_OPTIONS="${AGENT_OPTION} ${JAVA_TOOL_OPTIONS}"
+  else
+    export JAVA_TOOL_OPTIONS="${AGENT_OPTION}"
+  fi
+fi
+
+exec java ${JAVA_OPTS:-} -jar /app/app.jar "$@"
+EOF
+
+RUN chmod +x /entrypoint.sh
 
 # Common OTEL defaults (can be overridden at deploy time)
 ENV OTEL_TRACES_EXPORTER=otlp \
@@ -28,4 +45,4 @@ ENV OTEL_TRACES_EXPORTER=otlp \
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["/entrypoint.sh"]

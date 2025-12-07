@@ -6,6 +6,8 @@ global:
     app.kubernetes.io/part-of: stocat
     app.kubernetes.io/component: asset-scraper
 
+nameOverride: asset-scraper
+
 image:
   repository: stocat/asset-scraper
   tag: "0.0.1"

@@ -14,7 +14,26 @@ ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/release
 
 COPY build/libs/*.jar /app/app.jar
 
-ENV JAVA_TOOL_OPTIONS="-javaagent:/opt/otel/opentelemetry-javaagent.jar"
+ENV OTEL_AGENT_ENABLED=true
+
+RUN cat <<'EOF' >/entrypoint.sh
+#!/usr/bin/env sh
+set -e
+
+if [ "${OTEL_AGENT_ENABLED:-true}" = "true" ]; then
+  AGENT_OPTION="-javaagent:/opt/otel/opentelemetry-javaagent.jar"
+  if [ -n "${JAVA_TOOL_OPTIONS}" ]; then
+    export JAVA_TOOL_OPTIONS="${AGENT_OPTION} ${JAVA_TOOL_OPTIONS}"
+  else
+    export JAVA_TOOL_OPTIONS="${AGENT_OPTION}"
+  fi
+fi
+
+exec java ${JAVA_OPTS:-} -jar /app/app.jar "$@"
+EOF
+
+RUN chmod +x /entrypoint.sh
+
 ENV OTEL_TRACES_EXPORTER=otlp \
     OTEL_METRICS_EXPORTER=otlp \
     OTEL_LOGS_EXPORTER=otlp \
@@ -22,4 +41,4 @@ ENV OTEL_TRACES_EXPORTER=otlp \
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["/entrypoint.sh"]
