@@ -4,11 +4,11 @@ import com.stocat.common.redis.config.RedisConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(classes = { RedisConfig.class })
+@ContextConfiguration(classes = {RedisConfig.class})
 class StocatRedisApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

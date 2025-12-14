@@ -25,6 +25,10 @@ subprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
+    ext {
+        set('springCloudVersion', "2025.0.0")
+    }
+
     dependencies {
         // Lombok for boilerplate code reduction
         compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -33,4 +37,15 @@ subprojects {
         testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
 }

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UpbitCryptoMarketService {
-
+    private static final String TRADING_VOLUME_SOARING = "TRADING_VOLUME_SOARING";
     private final WebClient upbitWebClient;
 
     public Set<MarketInfo> getTopKrwTradeCrypto(int n) {
@@ -32,17 +32,20 @@ public class UpbitCryptoMarketService {
                         .collectList()
                         .block())
                 .stream()
-                .filter(detail ->
-                        detail.marketEvent() != null &&
-                                detail.marketEvent().caution() != null &&
-                                Boolean.TRUE.equals(
-                                        detail.marketEvent().caution().get("TRADING_VOLUME_SOARING")
-                                )
+                .filter(UpbitCryptoMarketService::isTradingVolumeSoaring
                 )
                 .filter(detail -> detail.market().startsWith("KRW-"))
                 .limit(n)
                 .map(detail -> new MarketInfo(detail.market(), detail.koreanName(), detail.englishName()))
                 .collect(Collectors.toSet());
+    }
+
+    private static boolean isTradingVolumeSoaring(MarketEventDetailResponse detail) {
+        return detail.marketEvent() != null &&
+                detail.marketEvent().caution() != null &&
+                Boolean.TRUE.equals(
+                        detail.marketEvent().caution().get(TRADING_VOLUME_SOARING)
+                );
     }
 
     /**
@@ -124,7 +127,7 @@ public class UpbitCryptoMarketService {
     private List<MarketEventDetailResponse> getVolumeSoaring(Collection<MarketEventDetailResponse> allDetails) {
         return allDetails.stream()
                 .filter(md -> md.marketEvent() != null && md.marketEvent().caution() != null)
-                .filter(md -> Boolean.TRUE.equals(md.marketEvent().caution().get("TRADING_VOLUME_SOARING")))
+                .filter(md -> Boolean.TRUE.equals(md.marketEvent().caution().get(TRADING_VOLUME_SOARING)))
                 .distinct()
                 .toList();
     }

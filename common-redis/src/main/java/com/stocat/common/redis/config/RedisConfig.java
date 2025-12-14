@@ -37,6 +37,7 @@ public class RedisConfig {
 
     /**
      * Redis 연결 팩토리를 생성합니다.
+     *
      * @return LettuceConnectionFactory 인스턴스
      */
     @Primary
@@ -52,6 +53,7 @@ public class RedisConfig {
 
     /**
      * 문자열 기반 Redis 템플릿을 생성합니다.
+     *
      * @param factory Redis 연결 팩토리
      * @return redisTemplate 인스턴스
      */

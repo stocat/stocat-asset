@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         scanBasePackages = {
                 "com.stocat.asset.scraper",
                 "com.stocat.common.redis",
-                "com.stocat.common.mysql"
+                "com.stocat.common"
         }
 )
 public class AssetScraperApplication {

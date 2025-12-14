@@ -2,13 +2,13 @@ package com.stocat.asset.scraper.crypto.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stocat.common.redis.constants.CryptoKeys;
 import com.stocat.asset.scraper.crypto.dto.MarketInfo;
 import com.stocat.asset.scraper.crypto.messaging.event.TradeInfo;
-import com.stocat.asset.scraper.crypto.model.AssetsEntity;
-import com.stocat.asset.scraper.crypto.model.enums.AssetsCategory;
-import com.stocat.asset.scraper.crypto.model.enums.Currency;
-import com.stocat.asset.scraper.crypto.repository.AssetsRepository;
+import com.stocat.common.domain.asset.domain.AssetsEntity;
+import com.stocat.common.domain.asset.domain.AssetsCategory;
+import com.stocat.common.domain.asset.domain.Currency;
+import com.stocat.common.domain.asset.repository.AssetsRepository;
+import com.stocat.common.redis.constants.CryptoKeys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class SubscriptionCodeService {
                 .filter(list -> !list.isEmpty())
                 .doOnNext(list -> log.debug("Redis 구독 코드 로드 완료: {}", list))
                 .doOnNext(sink::tryEmitNext)
-                .doOnSubscribe(sub -> log.debug("Redis 구독 코드 로드 시도"))
+                .doOnSubscribe(_ -> log.debug("Redis 구독 코드 로드 시도"))
                 .doOnError(err -> log.error("Redis 구독 코드 로드 실패", err))
                 .subscribe();
     }
@@ -70,25 +70,21 @@ public class SubscriptionCodeService {
     }
 
     /**
-     * 0) DB에 기존 symbol들 isActive를 false로 update, 새 심볼 정보 insert
+     * 0) DB에 새 심볼 정보 insert
      * 1) 기존 hotKey 리스트 삭제 후 RPUSH
      * 2) 같은 5개 코드를 subscription.redisKey에도 RPUSH
      * → SubscriptionCodeService가 자동 재구독
      */
     @Transactional
     public void refreshHotAndSubscribeCodes(Set<MarketInfo> targetSymbols) {
-        assetsRepository.findByIsActiveIsTrue()
-                .forEach(AssetsEntity::deactivate);
-
         List<AssetsEntity> newAssets = targetSymbols.stream()
-                .map(info -> AssetsEntity.builder()
-                        .symbol(info.code())
-                        .koName(info.koreanName())
-                        .usName(info.englishName())
-                        .category(AssetsCategory.CRYPTO)
-                        .currency(Currency.KRW)
-                        .isActive(true)
-                        .build())
+                .map(info -> AssetsEntity.create(
+                        info.code(),
+                        info.koreanName(),
+                        info.englishName(),
+                        AssetsCategory.CRYPTO,
+                        Currency.KRW)
+                )
                 .toList();
         assetsRepository.saveAll(newAssets);
         log.debug("DB 갱신 완료 - 저장된 자산 수: {}", newAssets.size());
@@ -101,7 +97,7 @@ public class SubscriptionCodeService {
         redisTemplate.delete(CryptoKeys.CRYPTO_HOT_CODES)
                 .then(redisTemplate.opsForSet().add(CryptoKeys.CRYPTO_HOT_CODES, codes))
                 .then(redisTemplate.opsForSet().add(CryptoKeys.CRYPTO_SUBSCRIBE_CODES, codes))
-                .doOnSubscribe(sub -> log.debug("Redis 핫/구독 코드 갱신 시작 - targetCodes={}", targetSymbols))
+                .doOnSubscribe(_ -> log.debug("Redis 핫/구독 코드 갱신 시작 - targetCodes={}", targetSymbols))
                 .subscribe(count -> log.debug("Redis 핫/구독 코드 갱신 완료 - count={}", count)
                         , err -> log.error("Redis 핫/구독 코드 갱신 실패", err))
         ;
