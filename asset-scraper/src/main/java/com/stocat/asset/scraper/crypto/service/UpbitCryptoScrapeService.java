@@ -57,7 +57,7 @@ public class UpbitCryptoScrapeService {
                                         )
                                         .then()
                         )
-                        .doOnSubscribe(_ -> log.debug("Upbit WebSocket 실행 스케줄 등록"))
+                        .doOnSubscribe(sub -> log.debug("Upbit WebSocket 실행 스케줄 등록"))
                         .doOnError(error -> log.error("Upbit WebSocket 실행 중 오류", error))
                         .doOnError(sink::error)
                         .subscribeOn(Schedulers.boundedElastic())
@@ -88,7 +88,7 @@ public class UpbitCryptoScrapeService {
      */
     private Mono<JsonNode> parseJson(String raw) {
         return Mono.fromCallable(() -> mapper.readTree(raw))
-                .onErrorResume(_ -> Mono.empty());
+                .onErrorResume(sub -> Mono.empty());
     }
 
     /**
