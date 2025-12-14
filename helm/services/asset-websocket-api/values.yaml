@@ -1,15 +1,12 @@
-# Default overrides for the Asset Scraper (background worker) service.
-# No Service resource is exposed by default; flip service.enabled to true if HTTP access is needed.
-
 global:
   labels:
     app.kubernetes.io/part-of: stocat
-    app.kubernetes.io/component: asset-scraper
+    app.kubernetes.io/component: asset-websocket-api
 
-nameOverride: asset-scraper
+nameOverride: asset-websocket-api
 
 image:
-  repository: stocat/asset-scraper
+  repository: stocat/asset-websocket-api
   tag: "0.0.1"
 
 containerPort: 8080

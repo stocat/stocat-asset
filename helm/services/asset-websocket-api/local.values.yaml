@@ -1,11 +1,9 @@
-# Local-only overrides for asset-scraper go here (optional).
-
 # OpenTelemetry configuration
 env:
   - name: OTEL_AGENT_ENABLED
     value: "true"
   - name: OTEL_SERVICE_NAME
-    value: "asset-scraper"
+    value: "asset-websocket-api"
   - name: OTEL_TRACES_SAMPLER
     value: "parentbased_always_on"
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
