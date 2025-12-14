@@ -3,7 +3,7 @@ TAG := local
 KIND_CLUSTER := stocat-local
 OTEL_AGENT_VERSION := 2.8.0
 GRADLE := ../../gradlew -p ../..
-MODULE := trade-websocket-api
+MODULE := asset-websocket-api
 IMAGE := $(REGISTRY)/$(MODULE):$(TAG)
 NAMESPACE := stocat
 

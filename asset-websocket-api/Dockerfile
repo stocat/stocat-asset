@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Build runs outside the image; this Dockerfile only packages the JAR and OTEL agent.
-# Expect the application JAR to be present at trade-websocket-api/build/libs/*.jar before docker build.
+# Expect the application JAR to be present at asset-websocket-api/build/libs/*.jar before docker build.
 
 FROM eclipse-temurin:21-jre AS runtime
 
