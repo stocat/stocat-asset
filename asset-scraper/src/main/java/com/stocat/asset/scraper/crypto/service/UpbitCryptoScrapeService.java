@@ -96,7 +96,7 @@ public class UpbitCryptoScrapeService {
      */
     private Mono<JsonNode> parseJson(String raw) {
         return Mono.fromCallable(() -> mapper.readTree(raw))
-                .onErrorResume(_ -> Mono.empty());
+                .onErrorResume(sub -> Mono.empty());
     }
 
     /**

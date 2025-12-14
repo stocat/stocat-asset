@@ -26,8 +26,8 @@ public class CryptoJob {
      * 3) 같은 5개 코드를 subscribeKey 에도 PUSH
      * → SubscriptionCodeService가 자동 재구독
      */
-   // @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-    @Scheduled(fixedRate = 60_000, initialDelay = 1000) // 로컬 테스트용
+//    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(fixedRate = 60_000, initialDelay = 1000)
     public void refreshHodCodeAndAddJobSubscribe() {
         Set<MarketInfo> dailyCodesSet = upbitCryptoMarketService.getTopKrwTradeCrypto(upbitApiProperties.getTopLimit());
         subscriptionCodeService.refreshHotAndSubscribeCodes(dailyCodesSet);

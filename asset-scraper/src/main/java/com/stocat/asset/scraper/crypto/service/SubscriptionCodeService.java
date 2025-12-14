@@ -55,7 +55,7 @@ public class SubscriptionCodeService {
                 .filter(list -> !list.isEmpty())
                 .doOnNext(list -> log.debug("Redis 구독 코드 로드 완료: {}", list))
                 .doOnNext(sink::tryEmitNext)
-                .doOnSubscribe(_ -> log.debug("Redis 구독 코드 로드 시도"))
+                .doOnSubscribe(sub -> log.debug("Redis 구독 코드 로드 시도"))
                 .doOnError(err -> log.error("Redis 구독 코드 로드 실패", err))
                 .subscribe();
     }
@@ -97,7 +97,7 @@ public class SubscriptionCodeService {
         redisTemplate.delete(CryptoKeys.CRYPTO_HOT_CODES)
                 .then(redisTemplate.opsForSet().add(CryptoKeys.CRYPTO_HOT_CODES, codes))
                 .then(redisTemplate.opsForSet().add(CryptoKeys.CRYPTO_SUBSCRIBE_CODES, codes))
-                .doOnSubscribe(_ -> log.debug("Redis 핫/구독 코드 갱신 시작 - targetCodes={}", targetSymbols))
+                .doOnSubscribe(sub -> log.debug("Redis 핫/구독 코드 갱신 시작 - targetCodes={}", targetSymbols))
                 .subscribe(count -> log.debug("Redis 핫/구독 코드 갱신 완료 - count={}", count)
                         , err -> log.error("Redis 핫/구독 코드 갱신 실패", err))
         ;

@@ -23,7 +23,7 @@ public class CryptoWebSocketHandler implements WebSocketHandler {
                                 .doOnCancel(() -> log.debug("WebSocket 세션 {}: 체결 데이터 스트림 취소", session.getId()))
                                 .doOnError(e -> log.error("WebSocket 세션 {}: 체결 데이터 전송 중 오류", session.getId(), e))
                 )
-                .doOnSubscribe(_ -> log.debug("WebSocket 세션 {} 연결 처리 시작", session.getId()))
+                .doOnSubscribe(sub -> log.debug("WebSocket 세션 {} 연결 처리 시작", session.getId()))
                 .doFinally(signal -> log.debug("WebSocket 세션 {} 종료 (signal={})", session.getId(), signal));
     }
 }

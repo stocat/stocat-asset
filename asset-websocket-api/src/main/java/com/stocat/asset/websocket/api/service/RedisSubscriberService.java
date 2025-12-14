@@ -20,7 +20,7 @@ public class RedisSubscriberService {
      */
     public Flux<String> subscribeTrades() {
         return redisContainer.receive(cryptoTradesTopic)
-                .doOnSubscribe(_ -> log.debug("Redis 토픽 {} 구독 시작", cryptoTradesTopic.getTopic()))
+                .doOnSubscribe(sub -> log.debug("Redis 토픽 {} 구독 시작", cryptoTradesTopic.getTopic()))
                 .map(ReactiveSubscription.Message::getMessage)
                 .doOnCancel(() -> log.debug("Redis 토픽 {} 구독 종료", cryptoTradesTopic.getTopic()))
                 .doOnError(e -> log.error("Redis 구독 오류", e));
