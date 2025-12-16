@@ -1,7 +1,7 @@
 dependencies {
-    implementation project(":common-redis")
-    implementation project(":common-mysql")
-    implementation project(":common-core")
+    implementation project(":asset-redis")
+    implementation project(":asset-mysql")
+    implementation project(":asset-core")
     
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

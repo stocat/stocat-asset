@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':common-redis')
+    implementation project(':asset-redis')
 
     // WebFlux & WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
