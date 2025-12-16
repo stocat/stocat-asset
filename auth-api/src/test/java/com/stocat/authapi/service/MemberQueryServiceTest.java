@@ -2,12 +2,12 @@ package com.stocat.authapi.service;
 
 import com.stocat.authapi.exception.AuthErrorCode;
 import com.stocat.authapi.service.dto.MemberDto;
-import com.stocat.common.domain.member.domain.AuthProvider;
-import com.stocat.common.domain.member.domain.MemberEntity;
-import com.stocat.common.domain.member.domain.MemberRole;
-import com.stocat.common.domain.member.domain.MemberStatus;
-import com.stocat.common.domain.member.repository.MemberRepository;
-import com.stocat.common.exception.ApiException;
+import com.stocat.asset.mysql.domain.member.domain.AuthProvider;
+import com.stocat.asset.mysql.domain.member.domain.MemberEntity;
+import com.stocat.asset.mysql.domain.member.domain.MemberRole;
+import com.stocat.asset.mysql.domain.member.domain.MemberStatus;
+import com.stocat.asset.mysql.domain.member.repository.MemberRepository;
+import com.stocat.asset.core.exception.ApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

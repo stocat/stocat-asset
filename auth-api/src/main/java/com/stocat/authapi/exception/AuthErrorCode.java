@@ -1,7 +1,7 @@
 package com.stocat.authapi.exception;
 
-import com.stocat.common.exception.ErrorCode;
-import com.stocat.common.exception.ErrorDomain;
+import com.stocat.asset.core.exception.ErrorCode;
+import com.stocat.asset.core.exception.ErrorDomain;
 
 public enum AuthErrorCode implements ErrorCode {
     INTERNAL_ERROR(ErrorDomain.AUTH.offset(), "서버 에러가 발생했습니다."),

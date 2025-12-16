@@ -2,9 +2,9 @@ package com.stocat.authapi.service;
 
 import com.stocat.authapi.exception.AuthErrorCode;
 import com.stocat.authapi.service.dto.MemberDto;
-import com.stocat.common.domain.member.domain.MemberEntity;
-import com.stocat.common.domain.member.repository.MemberRepository;
-import com.stocat.common.exception.ApiException;
+import com.stocat.asset.mysql.domain.member.domain.MemberEntity;
+import com.stocat.asset.mysql.domain.member.repository.MemberRepository;
+import com.stocat.asset.core.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

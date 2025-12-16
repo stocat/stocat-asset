@@ -8,7 +8,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @SpringBootApplication(
         scanBasePackages = {
                 "com.stocat.asset.websocket.api",
-                "com.stocat.common.redis",
+                "com.stocat.asset.redis",
         }
 )
 public class AssetWebsocketApiApplication {

@@ -6,7 +6,7 @@ import com.stocat.authapi.controller.dto.AuthErrorCodeResponse;
 import com.stocat.authapi.controller.dto.AuthResponse;
 import com.stocat.authapi.controller.dto.LoginRequest;
 import com.stocat.authapi.controller.dto.SignupRequest;
-import com.stocat.common.response.ApiResponse;
+import com.stocat.asset.core.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

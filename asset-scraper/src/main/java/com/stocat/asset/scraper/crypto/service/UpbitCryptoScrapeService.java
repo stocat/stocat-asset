@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stocat.asset.scraper.crypto.config.UpbitApiProperties;
 import com.stocat.asset.scraper.crypto.messaging.event.TradeInfo;
 import com.stocat.asset.scraper.crypto.messaging.event.TradeSide;
-import com.stocat.common.domain.asset.domain.Currency;
+import com.stocat.asset.mysql.domain.asset.domain.Currency;
 import com.stocat.asset.scraper.crypto.util.TradeParsingUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

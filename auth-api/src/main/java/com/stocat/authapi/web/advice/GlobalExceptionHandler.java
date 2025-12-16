@@ -1,8 +1,8 @@
 package com.stocat.authapi.web.advice;
 
 import com.stocat.authapi.exception.AuthErrorCode;
-import com.stocat.common.exception.ApiException;
-import com.stocat.common.response.ApiResponse;
+import com.stocat.asset.core.exception.ApiException;
+import com.stocat.asset.core.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;

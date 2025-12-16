@@ -1,7 +1,7 @@
 package com.stocat.asset.scraper.crypto.messaging.event;
 
 import com.stocat.asset.scraper.crypto.exception.AssetScraperErrorCode;
-import com.stocat.common.exception.ApiException;
+import com.stocat.asset.core.exception.ApiException;
 
 /**
  * 매매 구분

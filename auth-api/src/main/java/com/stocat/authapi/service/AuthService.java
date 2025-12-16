@@ -7,7 +7,7 @@ import com.stocat.authapi.controller.dto.LoginRequest;
 import com.stocat.authapi.controller.dto.SignupRequest;
 import com.stocat.authapi.exception.AuthErrorCode;
 import com.stocat.authapi.service.dto.MemberDto;
-import com.stocat.common.exception.ApiException;
+import com.stocat.asset.core.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

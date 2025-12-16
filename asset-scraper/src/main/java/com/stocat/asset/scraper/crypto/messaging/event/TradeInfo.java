@@ -1,6 +1,6 @@
 package com.stocat.asset.scraper.crypto.messaging.event;
 
-import com.stocat.common.domain.asset.domain.Currency;
+import com.stocat.asset.mysql.domain.asset.domain.Currency;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
