@@ -21,6 +21,8 @@ public class TradePublisher {
         subscriptionCodeService.codeFlux()
                 .doOnSubscribe(sub -> log.debug("체결 퍼블리시 파이프라인 구독 시작"))
                 .doOnNext(codes -> log.debug("새 구독 코드 수신: {}", codes))
+                .map(codes -> codes.stream().sorted().toList()) // Redis Set은 순서가 없으므로 정렬 후 비교
+                .distinctUntilChanged()
                 .switchMap(upbitCryptoScrapeService::streamTrades)
                 .flatMap(subscriptionCodeService::publishTrades)
                 .doOnError(err -> log.error("체결 퍼블리시 파이프라인 오류", err))

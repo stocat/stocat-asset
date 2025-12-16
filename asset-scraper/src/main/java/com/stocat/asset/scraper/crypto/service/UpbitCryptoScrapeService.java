@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -40,29 +41,36 @@ public class UpbitCryptoScrapeService {
     public Flux<TradeInfo> streamTrades(List<String> symbols) {
         String payload = buildSubscribePayload(symbols);
 
-        return Flux.create(sink ->
-                webSocketClient.execute(
-                                URI.create(upbitApiProperties.getWsUrl()),
-                                session -> session
-                                        .send(Mono.just(session.textMessage(payload)))
-                                        .thenMany(
-                                                session.receive()
-                                                        .map(WebSocketMessage::getPayloadAsText)
-                                                        .doOnSubscribe( _ -> log.debug("Upbit WebSocket 세션 수신 시작"))
-                                                        .flatMap(this::parseJson)
-                                                        .filter(this::isTrade)
-                                                        .map(this::toTradeInfo)
-                                                        .doOnNext(trade -> log.debug("Upbit 체결 수신: {}", trade))
-                                                        .doOnNext(sink::next)
-                                        )
-                                        .then()
-                        )
-                        .doOnSubscribe(sub -> log.debug("Upbit WebSocket 실행 스케줄 등록"))
-                        .doOnError(error -> log.error("Upbit WebSocket 실행 중 오류", error))
-                        .doOnError(sink::error)
-                        .subscribeOn(Schedulers.boundedElastic())
-                        .subscribe()
-        );
+        return Flux.create(sink -> {
+            Disposable subscription = webSocketClient.execute(
+                            URI.create(upbitApiProperties.getWsUrl()),
+                            session -> session
+                                    .send(Mono.just(session.textMessage(payload)))
+                                    .thenMany(
+                                            session.receive()
+                                                    .map(WebSocketMessage::getPayloadAsText)
+                                                    .doOnSubscribe(sub -> log.debug("Upbit WebSocket 세션 수신 시작"))
+                                                    .flatMap(this::parseJson)
+                                                    .filter(this::isTrade)
+                                                    .map(this::toTradeInfo)
+                                                    .doOnNext(trade -> log.debug("Upbit 체결 수신: {}", trade))
+                                                    .doOnNext(sink::next)
+                                    )
+                                    .then()
+                    )
+                    .doOnSubscribe(sub -> log.debug("Upbit WebSocket 실행 스케줄 등록 - codes={}", symbols))
+                    .doOnError(error -> {
+                        log.error("Upbit WebSocket 실행 중 오류", error);
+                        sink.error(error);
+                    })
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .subscribe();
+
+            sink.onDispose(() -> {
+                log.debug("Upbit WebSocket 연결 종료 요청 - codes={}", symbols);
+                subscription.dispose();
+            });
+        });
     }
 
     /**

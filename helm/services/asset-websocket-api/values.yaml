@@ -1,0 +1,21 @@
+global:
+  labels:
+    app.kubernetes.io/part-of: stocat
+    app.kubernetes.io/component: asset-websocket-api
+
+nameOverride: asset-websocket-api
+
+image:
+  repository: stocat/asset-websocket-api
+  tag: "0.0.1"
+
+containerPort: 8080
+
+service:
+  enabled: false
+  port: 8080
+
+env: []
+
+profiles:
+  active: ""

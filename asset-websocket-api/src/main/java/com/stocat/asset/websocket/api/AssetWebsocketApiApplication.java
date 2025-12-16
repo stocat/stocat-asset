@@ -11,10 +11,10 @@ import org.springframework.web.reactive.config.EnableWebFlux;
                 "com.stocat.common.redis",
         }
 )
-public class TradeWebsocketApiApplication {
+public class AssetWebsocketApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TradeWebsocketApiApplication.class, args);
+        SpringApplication.run(AssetWebsocketApiApplication.class, args);
     }
 
 }

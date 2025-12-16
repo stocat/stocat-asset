@@ -1,0 +1,4 @@
+# Local-only overrides for auth-api go here (optional).
+# Example: uncomment to run on an alternate port when developing locally.
+# service:
+#   port: 18080
