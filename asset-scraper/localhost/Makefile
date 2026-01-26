@@ -14,11 +14,11 @@ help:
 boot:
 	$(GRADLE) :$(MODULE):bootJar
 
-docker: boot
+docker:
 	docker build \
 		--build-arg OTEL_AGENT_VERSION=$(OTEL_AGENT_VERSION) \
 		-t $(IMAGE) \
-		-f ../Dockerfile ..
+		-f ../Dockerfile ../..
 
 kind-clean:
 	@if kind get clusters | grep -qx "$(KIND_CLUSTER)"; then \

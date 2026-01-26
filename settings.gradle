@@ -2,8 +2,6 @@ rootProject.name = 'stocat'
 include 'asset-scraper'
 include 'asset-websocket-api'
 
-include 'auth-api'
-
 include 'asset-redis'
 include 'asset-mysql'
 include 'asset-core'
