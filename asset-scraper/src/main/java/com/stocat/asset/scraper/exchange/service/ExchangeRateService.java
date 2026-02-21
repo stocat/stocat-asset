@@ -28,14 +28,12 @@ public class ExchangeRateService {
      * @return 퍼블리시 후 구독자 수 반환 Mono
      */
     public Mono<Long> publishRate(ExchangeRateInfo dto) {
-        try {
-            String json = mapper.writeValueAsString(dto);
-            log.debug("Redis 환율 차이 퍼블리시 준비 - channel={}, payload={}", ExchangeRateKeys.EXCHANGE_RATES, json);
-            return redisTemplate.convertAndSend(ExchangeRateKeys.EXCHANGE_RATES, json)
-                    .doOnSuccess(count -> log.debug("Redis 환율 퍼블리시 완료 - subscriberCount={}", count))
-                    .doOnError(err -> log.error("Redis 환율 퍼블리시 실패", err));
-        } catch (JsonProcessingException e) {
-            return Mono.error(e);
-        }
+        return Mono.fromCallable(() -> mapper.writeValueAsString(dto))
+                .flatMap(json -> {
+                    log.debug("Redis 환율 차이 퍼블리시 준비 - channel={}, payload={}", ExchangeRateKeys.EXCHANGE_RATES, json);
+                    return redisTemplate.convertAndSend(ExchangeRateKeys.EXCHANGE_RATES, json);
+                })
+                .doOnSuccess(count -> log.debug("Redis 환율 퍼블리시 완료 - subscriberCount={}", count))
+                .doOnError(err -> log.error("Redis 환율 퍼블리시 실패", err));
     }
 }
