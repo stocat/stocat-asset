@@ -1,6 +1,8 @@
 # toss_krw_optimized.py
 import re
 import time
+import requests
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -53,6 +55,17 @@ if __name__ == "__main__":
                 val = extract_number(txt)
                 if val:
                     print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] KRW: {val}")
+                    # API에 전송
+                    val_cleaned = val.replace(',', '').replace('원', '').strip()
+                    payload = {
+                        "currencyPair": "USDKRW",
+                        "exchangeRate": float(val_cleaned),
+                        "timestamp": datetime.now().isoformat()
+                    }
+                    try:
+                        requests.post("http://localhost:8080/api/v1/exchange-rates", json=payload, timeout=2)
+                    except Exception as e:
+                        print(f"API 전송 실패: {e}")
                 else:
                     print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] KRW: <값 미검출>")
 

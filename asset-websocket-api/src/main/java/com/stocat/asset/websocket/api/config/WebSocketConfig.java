@@ -1,6 +1,7 @@
 package com.stocat.asset.websocket.api.config;
 
 import com.stocat.asset.websocket.api.websocket.CryptoWebSocketHandler;
+import com.stocat.asset.websocket.api.websocket.ExchangeRateWebSocketHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -14,11 +15,13 @@ import java.util.Map;
 public class WebSocketConfig {
 
     @Bean
-    public HandlerMapping webSocketMapping(CryptoWebSocketHandler handler) {
+    public HandlerMapping webSocketMapping(CryptoWebSocketHandler cryptoHandler,
+            ExchangeRateWebSocketHandler exchangeRateHandler) {
         return new SimpleUrlHandlerMapping(
-                Map.of("/ws/crypto/trades", handler),
-                Ordered.HIGHEST_PRECEDENCE
-        );
+                Map.of(
+                        "/ws/crypto/trades", cryptoHandler,
+                        "/ws/exchange-rates", exchangeRateHandler),
+                Ordered.HIGHEST_PRECEDENCE);
     }
 
     @Bean
