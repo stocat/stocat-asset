@@ -2,6 +2,7 @@ package com.stocat.asset.redis.config;
 
 import com.stocat.asset.redis.constants.CryptoKeys;
 import com.stocat.asset.redis.constants.ExchangeRateKeys;
+import com.stocat.asset.redis.constants.StockKeys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -95,5 +96,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic exchangeRatesTopic() {
         return new ChannelTopic(ExchangeRateKeys.EXCHANGE_RATES);
+    }
+
+    @Bean
+    public ChannelTopic krStockTradesTopic() {
+        return new ChannelTopic(StockKeys.STOCK_TRADES);
     }
 }

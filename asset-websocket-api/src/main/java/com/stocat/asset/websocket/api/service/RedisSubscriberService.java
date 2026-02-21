@@ -15,6 +15,18 @@ public class RedisSubscriberService {
     private final ReactiveRedisMessageListenerContainer redisContainer;
     private final ChannelTopic cryptoTradesTopic;
     private final ChannelTopic exchangeRatesTopic;
+    private final ChannelTopic krStockTradesTopic;
+
+    /**
+     * "stock:trades" 채널 메시지를 실시간으로 스트리밍합니다.
+     */
+    public Flux<String> subscribeKrStockTrades() {
+        return redisContainer.receive(krStockTradesTopic)
+                .doOnSubscribe(sub -> log.debug("[KR_STOCK] Redis 토픽 {} 구독 시작", krStockTradesTopic.getTopic()))
+                .map(ReactiveSubscription.Message::getMessage)
+                .doOnCancel(() -> log.debug("[KR_STOCK] Redis 토픽 {} 구독 종료", krStockTradesTopic.getTopic()))
+                .doOnError(e -> log.error("[KR_STOCK] 주식 구독 오류", e));
+    }
 
     /**
      * "crypto:trades" 채널 메시지를 실시간으로 스트리밍합니다.
