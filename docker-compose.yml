@@ -12,7 +12,7 @@ services:
       MYSQL_ROOT_HOST: '%'
       TZ: Asia/Seoul
     ports:
-      - "3305:3306"
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     command: >
@@ -24,10 +24,10 @@ services:
     image: redis:7
     container_name: stock-redis
     ports:
-      - "6380:6379"
+      - "6379:6379"
     volumes:
       - redis_data:/data
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
 volumes:
   mysql_data:
   redis_data:

@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+spring:
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis-master.data.svc.cluster.local}
+      port: ${SPRING_DATA_REDIS_PORT:6379}

@@ -1,0 +1,11 @@
+server:
+  port: 8082
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+logging:
+    level:
+      com.stocat.asset.websocket.api: DEBUG

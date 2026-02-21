@@ -1,0 +1,22 @@
+# Default overrides for the Auth API deployment.
+# Update image/tag/ports per release and layer environment-specific files on top.
+
+global:
+  labels:
+    app.kubernetes.io/part-of: stocat
+    app.kubernetes.io/component: auth-api
+
+image:
+  repository: stocat/auth-api
+  tag: "0.0.1"
+
+containerPort: 8080
+
+service:
+  enabled: true
+  port: 8080
+
+env: []
+
+profiles:
+  active: ""

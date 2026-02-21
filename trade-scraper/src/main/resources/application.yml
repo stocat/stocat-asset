@@ -1,8 +1,0 @@
-server:
-  port: 8081
-
-upbit:
-  api:
-    rest-base-url: https://api.upbit.com
-    ws-url: wss://api.upbit.com/websocket/v1
-    top-limit: 5
