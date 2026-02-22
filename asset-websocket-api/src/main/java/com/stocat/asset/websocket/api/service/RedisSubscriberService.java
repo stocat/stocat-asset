@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 public class RedisSubscriberService {
     private final ReactiveRedisMessageListenerContainer redisContainer;
     private final ChannelTopic cryptoTradesTopic;
+    private final ChannelTopic exchangeRatesTopic;
 
     /**
      * "crypto:trades" 채널 메시지를 실시간으로 스트리밍합니다.
@@ -24,5 +25,16 @@ public class RedisSubscriberService {
                 .map(ReactiveSubscription.Message::getMessage)
                 .doOnCancel(() -> log.debug("Redis 토픽 {} 구독 종료", cryptoTradesTopic.getTopic()))
                 .doOnError(e -> log.error("Redis 구독 오류", e));
+    }
+
+    /**
+     * "exchange:rates" 채널 메시지를 실시간으로 스트리밍합니다.
+     */
+    public Flux<String> subscribeExchangeRates() {
+        return redisContainer.receive(exchangeRatesTopic)
+                .doOnSubscribe(sub -> log.debug("Redis 토픽 {} 구독 시작", exchangeRatesTopic.getTopic()))
+                .map(ReactiveSubscription.Message::getMessage)
+                .doOnCancel(() -> log.debug("Redis 토픽 {} 구독 종료", exchangeRatesTopic.getTopic()))
+                .doOnError(e -> log.error("Redis 환율 구독 오류", e));
     }
 }

@@ -1,6 +1,7 @@
 package com.stocat.asset.redis.config;
 
 import com.stocat.asset.redis.constants.CryptoKeys;
+import com.stocat.asset.redis.constants.ExchangeRateKeys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -25,7 +26,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Slf4j
 @Configuration
-@EnableAutoConfiguration(exclude={RedisAutoConfiguration.class, RedisReactiveAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = { RedisAutoConfiguration.class, RedisReactiveAutoConfiguration.class })
 public class RedisConfig {
 
     @Bean
@@ -62,8 +63,7 @@ public class RedisConfig {
             ReactiveRedisConnectionFactory factory) {
         return new ReactiveStringRedisTemplate(
                 factory,
-                RedisSerializationContext.string()
-        );
+                RedisSerializationContext.string());
     }
 
     @Primary
@@ -87,9 +87,13 @@ public class RedisConfig {
         return template;
     }
 
-
     @Bean
     public ChannelTopic cryptoTradesTopic() {
         return new ChannelTopic(CryptoKeys.CRYPTO_TRADES);
+    }
+
+    @Bean
+    public ChannelTopic exchangeRatesTopic() {
+        return new ChannelTopic(ExchangeRateKeys.EXCHANGE_RATES);
     }
 }
