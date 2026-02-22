@@ -1,4 +1,4 @@
-package com.stocat.asset.scraper.crypto.config;
+package com.stocat.asset.scraper.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

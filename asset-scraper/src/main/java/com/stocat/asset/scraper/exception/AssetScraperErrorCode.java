@@ -1,4 +1,4 @@
-package com.stocat.asset.scraper.crypto.exception;
+package com.stocat.asset.scraper.exception;
 
 import com.stocat.asset.core.exception.ErrorCode;
 import com.stocat.asset.core.exception.ErrorDomain;
