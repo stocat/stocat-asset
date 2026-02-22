@@ -8,6 +8,19 @@ upbit:
     ws-url: wss://api.upbit.com/websocket/v1
     top-limit: 5
 
+stock:
+  tickers: AAPL,TSLA,NVDA,MSFT,AMZN
+  polling-interval: PT3S
+  redis:
+    channel: stock-updates
+  quote:
+    provider: yahoo
+
+alpha-vantage:
+  api:
+    base-url: https://www.alphavantage.co
+    api-key: ${ALPHA_VANTAGE_API_KEY:YZXN9WVRUEZPSSO1}
+
 server:
   port: 8080
 
