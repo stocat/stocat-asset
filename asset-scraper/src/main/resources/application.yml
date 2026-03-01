@@ -8,6 +8,16 @@ upbit:
     ws-url: wss://api.upbit.com/websocket/v1
     top-limit: 5
 
+kr-stock:
+  enabled: ${KR_STOCK_ENABLED:false}
+  subscribe-limit: ${KR_STOCK_SUBSCRIBE_LIMIT:5}
+  kis:
+    client-id: ${KR_STOCK_CLIENT_ID:}
+    client-secret: ${KR_STOCK_CLIENT_SECRET:}
+    websocket-url: ws://ops.koreainvestment.com:31000
+    auth-base-url: https://openapivts.koreainvestment.com:29443
+    symbols: []
+
 server:
   port: 8080
 
