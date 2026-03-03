@@ -4,13 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
 @EnableWebFlux
-@SpringBootApplication(
-        scanBasePackages = {
-                "com.stocat.asset.websocket.api",
-                "com.stocat.asset.redis",
-        }
-)
+@EnableDiscoveryClient
+@SpringBootApplication(scanBasePackages = {
+        "com.stocat.asset.websocket.api",
+        "com.stocat.asset.redis",
+})
 public class AssetWebsocketApiApplication {
 
     public static void main(String[] args) {

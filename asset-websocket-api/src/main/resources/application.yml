@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: asset-websocket-api
   profiles:
     active: local
 
