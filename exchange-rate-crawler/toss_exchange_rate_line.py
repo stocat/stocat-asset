@@ -63,7 +63,7 @@ if __name__ == "__main__":
                         "timestamp": datetime.now().isoformat()
                     }
                     try:
-                        requests.post("http://localhost:8080/api/v1/exchange-rates", json=payload, timeout=2)
+                        requests.post("http://localhost:18080/api/v1/exchange-rates", json=payload, timeout=2)
                     except Exception as e:
                         print(f"API 전송 실패: {e}")
                 else:

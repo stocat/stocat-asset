@@ -9,7 +9,7 @@ upbit:
     top-limit: 5
 
 server:
-  port: 8080
+  port: 18080
 
 management:
   endpoints:
