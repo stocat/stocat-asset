@@ -1,5 +1,6 @@
 package com.stocat.asset.scraper.kr_stock.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +13,6 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -184,7 +184,7 @@ public class KrStockTickStreamSubscriber {
                 .doOnError(err -> log.error("KIS WebSocket 연결 오류", err));
     }
 
-    private String serializePayload(Map<String, Object> payload, String symbol) {
+    private String serializePayload(Object payload, String symbol) {
         try {
             return mapper.writeValueAsString(payload);
         } catch (JsonProcessingException e) {
@@ -192,22 +192,19 @@ public class KrStockTickStreamSubscriber {
         }
     }
 
-    private Map<String, Object> toSubscribePayload(String approvalKey, String trId, String symbol) {
-        Map<String, Object> header = new HashMap<>();
-        header.put("approval_key", approvalKey);
-        header.put("custtype", "P");
-        header.put("tr_type", "1");
-        header.put("content-type", "utf-8");
-
-        Map<String, Object> input = new HashMap<>();
-        input.put("tr_id", trId);
-        input.put("tr_key", symbol);
-
-        Map<String, Object> body = Collections.singletonMap("input", input);
-        Map<String, Object> request = new HashMap<>();
-        request.put("header", header);
-        request.put("body", body);
-        return request;
+    /**
+     * 웹소켓 구독 요청을 위한 페이로드 객체를 생성합니다.
+     *
+     * @param approvalKey 웹소켓 접속키
+     * @param trId        거래 ID (예: H0STASP0)
+     * @param symbol      종목 코드
+     * @return 구독 요청 객체 (SubscribeRequest)
+     */
+    private SubscribeRequest toSubscribePayload(String approvalKey, String trId, String symbol) {
+        SubscribeHeader header = new SubscribeHeader(approvalKey, "P", "1", "utf-8");
+        SubscribeInput input = new SubscribeInput(trId, symbol);
+        SubscribeBody body = new SubscribeBody(input);
+        return new SubscribeRequest(header, body);
     }
 
     /**
@@ -288,6 +285,35 @@ public class KrStockTickStreamSubscriber {
         return List.of(askTrade, bidTrade);
     }
 
-    private record ApprovalRequest(String grant_type, String appkey, String secretkey) {
+    private record ApprovalRequest(
+            @JsonProperty("grant_type") String grantType,
+            @JsonProperty("appkey") String appKey,
+            @JsonProperty("secretkey") String secretKey
+    ) {
+    }
+
+    private record SubscribeRequest(
+            @JsonProperty("header") SubscribeHeader header,
+            @JsonProperty("body") SubscribeBody body
+    ) {
+    }
+
+    private record SubscribeHeader(
+            @JsonProperty("approval_key") String approvalKey,
+            @JsonProperty("custtype") String custType,
+            @JsonProperty("tr_type") String trType,
+            @JsonProperty("content-type") String contentType
+    ) {
+    }
+
+    private record SubscribeBody(
+            @JsonProperty("input") SubscribeInput input
+    ) {
+    }
+
+    private record SubscribeInput(
+            @JsonProperty("tr_id") String trId,
+            @JsonProperty("tr_key") String trKey
+    ) {
     }
 }
