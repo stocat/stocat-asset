@@ -3,6 +3,7 @@ package com.stocat.asset.scraper.kr_stock.service;
 import com.stocat.asset.redis.constants.StockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -11,10 +12,6 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,6 +36,10 @@ public class KrStockSubscriptionService {
                     return Mono.empty();
                 })
                 .then(reloadCodesMono())
+                .onErrorResume(e -> {
+                    log.error("KR 주식 코드 초기 로드 실패", e);
+                    return Mono.empty();
+                })
                 .subscribe();
     }
 
@@ -50,7 +51,12 @@ public class KrStockSubscriptionService {
         if (!properties.isEnabled()) {
             return;
         }
-        reloadCodesMono().subscribe();
+        reloadCodesMono()
+                .onErrorResume(e -> {
+                    log.error("KR 주식 코드 리로드 실패", e);
+                    return Mono.empty();
+                })
+                .subscribe();
     }
 
     private Mono<Void> reloadCodesMono() {
@@ -64,7 +70,7 @@ public class KrStockSubscriptionService {
                         .distinct()
                         .sorted()
                         .limit(limit)
-                        .collect(Collectors.toCollection(ArrayList::new))
+                        .toList()
                 )
                 .filter(list -> !list.isEmpty())
                 .doOnNext(list -> log.info("Redis KR 주식 구독 코드 로드 완료 - {}", list))

@@ -97,9 +97,18 @@ public class KrStockTickStreamSubscriber {
         subscriptionService.codeFlux()
                 .map(symbols -> symbols.stream().limit(properties.getSubscribeLimit()).toList())
                 .distinctUntilChanged()
-                .switchMap(this::subscribeSymbols)
+                .switchMap(symbols -> this.subscribeSymbols(symbols)
+                        .onErrorResume(error -> {
+                            // 웹소켓 연결 실패 시 로그만 남기고 빈 스트림으로 대체
+                            log.error("KR 주식 구독 실패. 다음 종목 업데이트 시 재시도합니다. symbols={}", symbols, error);
+                            return Mono.empty(); // 실패한 stream만 종료
+                        })
+                )
                 .doOnSubscribe(sub -> log.info("KR 주식 구독 코드 flux 구독 시작"))
-                .doOnError(error -> log.error("KR 주식 실시간 구독 파이프라인 오류", error))
+                .onErrorResume(error -> {
+                    log.error("KR 주식 구독 외부 파이프라인 오류", error);
+                    return Mono.empty();
+                })
                 .subscribe();
     }
 
