@@ -19,3 +19,18 @@ spring:
 logging:
   level:
     com.stocat.asset.scraper: DEBUG
+
+kr-stock:
+  enabled: true
+  subscribe-limit: 5
+  kis:
+    client-id: ${KR_STOCK_CLIENT_ID:PS1MPI6vlpp5O4oUWKdJ5Jlzv8SOZlLZncmd}
+    client-secret: ${KR_STOCK_CLIENT_SECRET:a+RNn2Z18tnNoJdzEBErxtjM1KxFHBaEp6M56pe2pTMSxKCIcvJpWpZhCL7M+xXkEd7cQCkGiOjVvb3PCR3laItX1+auMRSEVLAD55E4zSR+VU6YeP1+wG3bWFx6LGNpoWUO/y3ablGNd8pWMNVZxRiwmeuwkLyFaKD+5xtWkHIIR+y5tVs=}
+    websocket-url: ws://ops.koreainvestment.com:31000
+    auth-base-url: https://openapivts.koreainvestment.com:29443
+    symbols:
+      - "005930"
+      - "000660"
+      - "373220"
+      - "051910"
+      - "000270"

@@ -3,7 +3,7 @@ package com.stocat.asset.scraper.crypto.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stocat.asset.scraper.crypto.dto.MarketInfo;
-import com.stocat.asset.scraper.crypto.messaging.event.TradeInfo;
+import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import com.stocat.asset.mysql.domain.asset.domain.AssetsEntity;
 import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.mysql.domain.asset.domain.Currency;

@@ -1,4 +1,4 @@
-package com.stocat.asset.scraper.crypto.messaging.event;
+package com.stocat.asset.scraper.messaging.event;
 
 import com.stocat.asset.mysql.domain.asset.domain.Currency;
 

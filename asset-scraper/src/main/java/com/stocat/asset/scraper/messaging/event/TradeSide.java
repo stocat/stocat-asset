@@ -1,6 +1,6 @@
-package com.stocat.asset.scraper.crypto.messaging.event;
+package com.stocat.asset.scraper.messaging.event;
 
-import com.stocat.asset.scraper.crypto.exception.AssetScraperErrorCode;
+import com.stocat.asset.scraper.exception.AssetScraperErrorCode;
 import com.stocat.asset.core.exception.ApiException;
 
 /**

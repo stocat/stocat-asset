@@ -1,4 +1,4 @@
-package com.stocat.asset.scraper.crypto.config;
+package com.stocat.asset.scraper.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
