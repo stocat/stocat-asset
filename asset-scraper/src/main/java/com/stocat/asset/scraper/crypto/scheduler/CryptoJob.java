@@ -1,8 +1,8 @@
 package com.stocat.asset.scraper.crypto.scheduler;
 
 import com.stocat.asset.scraper.crypto.config.UpbitApiProperties;
-import com.stocat.asset.scraper.crypto.dto.MarketInfo;
-import com.stocat.asset.scraper.crypto.service.SubscriptionCodeService;
+import com.stocat.asset.scraper.dto.MarketInfo;
+import com.stocat.asset.scraper.service.SubscriptionCodeService;
 import com.stocat.asset.scraper.crypto.service.UpbitCryptoMarketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,7 +14,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CryptoJob {
 
-    private final SubscriptionCodeService subscriptionCodeService;
+    private final SubscriptionCodeService cryptoSubscriptionService;
     private final UpbitCryptoMarketService upbitCryptoMarketService;
     private final UpbitApiProperties upbitApiProperties;
 
@@ -30,8 +30,9 @@ public class CryptoJob {
     @Scheduled(fixedRate = 60_000, initialDelay = 1000)
     public void refreshHodCodeAndAddJobSubscribe() {
         Set<MarketInfo> dailyCodesSet = upbitCryptoMarketService.getTopKrwTradeCrypto(upbitApiProperties.getTopLimit());
-        subscriptionCodeService.refreshHotAndSubscribeCodes(dailyCodesSet);
-        subscriptionCodeService.reloadCodes();
+        cryptoSubscriptionService.refreshHotAndSubscribeCodes(dailyCodesSet)
+                .then(cryptoSubscriptionService.reloadCodes())
+                .subscribe();
     }
 
 }
