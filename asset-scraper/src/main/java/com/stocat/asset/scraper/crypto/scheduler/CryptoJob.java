@@ -2,13 +2,13 @@ package com.stocat.asset.scraper.crypto.scheduler;
 
 import com.stocat.asset.scraper.crypto.config.UpbitApiProperties;
 import com.stocat.asset.scraper.crypto.service.UpbitCryptoMarketProvider;
-import com.stocat.asset.scraper.dto.MarketInfo;
 import com.stocat.asset.scraper.service.SubscriptionCodeService;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CryptoJob {
@@ -23,10 +23,14 @@ public class CryptoJob {
      * SubscriptionCodeService가 자동 재구독
      */
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-    public void refreshHodCodeAndAddJobSubscribe() {
-        Set<MarketInfo> dailyCodesSet = upbitCryptoMarketProvider.getTargetCrypto(upbitApiProperties.getTopLimit());
-        cryptoSubscriptionService.refreshHotAndSubscribeCodes(dailyCodesSet)
-                .then(cryptoSubscriptionService.reloadCodes())
+    public void refreshCryptoMarkets() {
+        upbitCryptoMarketProvider.getTargetCrypto(upbitApiProperties.getTopLimit())
+                .doOnError(error -> log.error("코인 종목 선정 중 오류 발생", error))
+                .flatMap(dailyCodesSet ->
+                        cryptoSubscriptionService.refreshHotAndSubscribeCodes(dailyCodesSet)
+                                .then(cryptoSubscriptionService.reloadCodes())
+                )
+                .doOnError(error -> log.error("코인 종목 갱신 실패", error))
                 .subscribe();
     }
 

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import reactor.core.publisher.Mono;
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,12 +39,14 @@ public class RandomStockMarketProvider implements StockMarketProvider {
      * @return 선택된 종목 코드들의 Set
      */
     @Override
-    public Set<MarketInfo> getTargetStocks(int limit) {
-        List<MarketInfo> shuffled = new ArrayList<>(POOL);
-        Collections.shuffle(shuffled);
-
-        return shuffled.stream()
-                .limit(limit)
-                .collect(Collectors.toSet());
+    public Mono<Set<MarketInfo>> getTargetStocks(int limit) {
+        return Mono.fromCallable(() -> {
+            List<MarketInfo> shuffled = new ArrayList<>(POOL);
+            Collections.shuffle(shuffled);
+            
+            return shuffled.stream()
+                    .limit(limit)
+                    .collect(Collectors.toSet());
+        });
     }
 }
