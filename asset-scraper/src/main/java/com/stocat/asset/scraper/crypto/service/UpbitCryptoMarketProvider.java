@@ -19,11 +19,11 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Service
 @RequiredArgsConstructor
-public class UpbitCryptoMarketService {
+public class UpbitCryptoMarketProvider {
     private static final String TRADING_VOLUME_SOARING = "TRADING_VOLUME_SOARING";
     private final WebClient upbitWebClient;
 
-    public Set<MarketInfo> getTopKrwTradeCrypto(int n) {
+    public Set<MarketInfo> getTargetCrypto(int n) {
         return Objects.requireNonNull(upbitWebClient.get()
                         .uri(uri -> uri.path("/v1/market/all")
                                 .queryParam("isDetails", "true")
