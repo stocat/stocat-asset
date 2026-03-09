@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.mysql.domain.asset.repository.AssetsRepository;
 import com.stocat.asset.redis.constants.CryptoKeys;
+import com.stocat.asset.redis.constants.StockKeys;
 import com.stocat.asset.scraper.service.SubscriptionCodeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,22 @@ public class ScraperServiceConfig {
                 CryptoKeys.CRYPTO_HOT_CODES,
                 CryptoKeys.CRYPTO_TRADES,
                 AssetsCategory.CRYPTO
+        );
+    }
+    
+    @Bean
+    public SubscriptionCodeService krStockSubscriptionService(
+            ReactiveStringRedisTemplate redisTemplate,
+            AssetsRepository assetsRepository,
+            ObjectMapper mapper) {
+        return new SubscriptionCodeService(
+                redisTemplate,
+                assetsRepository,
+                mapper,
+                StockKeys.STOCK_SUBSCRIBE_CODES,
+                StockKeys.STOCK_HOT_CODES,
+                StockKeys.STOCK_TRADES,
+                AssetsCategory.KOR_STOCK
         );
     }
 }
