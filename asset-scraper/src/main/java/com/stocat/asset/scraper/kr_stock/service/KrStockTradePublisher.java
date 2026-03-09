@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KrStockTickStreamSubscriber {
+public class KrStockTradePublisher {
 
     private static final String APPROVAL_ENDPOINT = "/oauth2/Approval";
     /**
