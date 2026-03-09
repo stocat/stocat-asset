@@ -13,14 +13,13 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Schedulers;
 
 /**
- * Redis의 구독 코드를 관리하고 변경 사항을 전파하는 공통 서비스입니다.
- * Crypto와 Stock 등 자산군별로 Bean을 생성하여 사용합니다.
+ * Redis의 구독 코드를 관리하고 변경 사항을 전파하는 공통 서비스입니다. Crypto와 Stock 등 자산군별로 Bean을 생성하여 사용합니다.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -63,25 +62,32 @@ public class SubscriptionCodeService {
     /**
      * DB에 자산 정보를 저장하고 Redis 키를 갱신합니다.
      */
-    @Transactional
     public Mono<Void> refreshHotAndSubscribeCodes(Set<MarketInfo> targetSymbols) {
-        List<AssetsEntity> newAssets = targetSymbols.stream()
-                .map(info -> AssetsEntity.create(
-                        info.code(),
-                        info.koreanName(),
-                        info.englishName(),
-                        assetsCategory,
-                        Currency.KRW)
-                )
-                .toList();
-        assetsRepository.saveAll(newAssets);
-        log.debug("DB 갱신 완료 ({}) - 저장된 자산 수: {}", assetsCategory, newAssets.size());
+        // 1. DB 저장 작업 (블로킹 작업이므로 별도 스레드에서 수행)
+        Mono<Void> dbTask = Mono.fromRunnable(() -> {
+            List<AssetsEntity> newAssets = targetSymbols.stream()
+                    .map(info -> AssetsEntity.create(
+                            info.code(),
+                            info.koreanName(),
+                            info.englishName(),
+                            assetsCategory,
+                            Currency.KRW)
+                    )
+                    .toList();
+            assetsRepository.saveAll(newAssets);
+            log.debug("DB 갱신 완료 ({}) - 저장된 자산 수: {}", assetsCategory, newAssets.size());
+        }).subscribeOn(Schedulers.boundedElastic()).then();
 
-        String[] codes = targetSymbols.stream()
-                .map(MarketInfo::code)
-                .toArray(String[]::new);
+        // 2. Redis 저장 작업 (논블로킹 작업이므로 즉시 실행)
+        Mono<Void> redisTask = Mono.defer(() -> {
+            String[] codes = targetSymbols.stream()
+                    .map(MarketInfo::code)
+                    .toArray(String[]::new);
+            return updateRedisKeys(codes);
+        });
 
-        return updateRedisKeys(codes);
+        // 3. 두 작업을 동시에 실행하고, 둘 다 끝나면 종료
+        return Mono.when(dbTask, redisTask);
     }
 
     private Mono<Void> updateRedisKeys(String[] codes) {
