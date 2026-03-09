@@ -1,4 +1,4 @@
-package com.stocat.asset.scraper.kr_stock.service;
+package com.stocat.asset.scraper.kr_stock.messaging.publisher;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
