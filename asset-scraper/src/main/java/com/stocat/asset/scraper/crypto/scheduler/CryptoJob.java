@@ -1,37 +1,37 @@
 package com.stocat.asset.scraper.crypto.scheduler;
 
 import com.stocat.asset.scraper.crypto.config.UpbitApiProperties;
-import com.stocat.asset.scraper.crypto.dto.MarketInfo;
-import com.stocat.asset.scraper.crypto.service.SubscriptionCodeService;
-import com.stocat.asset.scraper.crypto.service.UpbitCryptoMarketService;
+import com.stocat.asset.scraper.crypto.service.UpbitCryptoMarketProvider;
+import com.stocat.asset.scraper.crypto.service.CryptoSubscriptionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CryptoJob {
 
-    private final SubscriptionCodeService subscriptionCodeService;
-    private final UpbitCryptoMarketService upbitCryptoMarketService;
+    private final CryptoSubscriptionService cryptoSubscriptionService;
+    private final UpbitCryptoMarketProvider upbitCryptoMarketProvider;
     private final UpbitApiProperties upbitApiProperties;
 
 
     /**
-     * 매일 00:00에 스케줄
-     * 1) Upbit에서 Top N개의 랜덤 종목 조회
-     * 2) 기존 hotKey 리스트 삭제 후 PUSH
-     * 3) 같은 5개 코드를 subscribeKey 에도 PUSH
-     * → SubscriptionCodeService가 자동 재구독
+     * 매일 00:00에 스케줄 1) Upbit에서 Top N개의 랜덤 종목 조회 2) 기존 hotKey 리스트 삭제 후 PUSH 3) 같은 5개 코드를 subscribeKey 에도 PUSH →
+     * SubscriptionCodeService가 자동 재구독
      */
-//    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-    @Scheduled(fixedRate = 60_000, initialDelay = 1000)
-    public void refreshHodCodeAndAddJobSubscribe() {
-        Set<MarketInfo> dailyCodesSet = upbitCryptoMarketService.getTopKrwTradeCrypto(upbitApiProperties.getTopLimit());
-        subscriptionCodeService.refreshHotAndSubscribeCodes(dailyCodesSet);
-        subscriptionCodeService.reloadCodes();
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
+    public void refreshCryptoMarkets() {
+        upbitCryptoMarketProvider.getTargetCrypto(upbitApiProperties.getTopLimit())
+                .doOnError(error -> log.error("코인 종목 선정 중 오류 발생", error))
+                .flatMap(dailyCodesSet ->
+                        cryptoSubscriptionService.refreshHotAndSubscribeCodes(dailyCodesSet)
+                                .then(cryptoSubscriptionService.reloadCodes())
+                )
+                .doOnError(error -> log.error("코인 종목 갱신 실패", error))
+                .subscribe();
     }
 
 }
