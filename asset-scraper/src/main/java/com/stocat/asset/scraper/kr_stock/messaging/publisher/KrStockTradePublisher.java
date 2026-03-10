@@ -8,7 +8,7 @@ import com.stocat.asset.mysql.domain.asset.domain.Currency;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import com.stocat.asset.scraper.messaging.event.TradeSide;
-import com.stocat.asset.scraper.service.SubscriptionCodeService;
+import com.stocat.asset.scraper.kr_stock.service.StockSubscriptionService;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -63,7 +63,7 @@ public class KrStockTradePublisher {
      */
     private static final int IDX_BID_SIZE_1 = 33;
 
-    private final SubscriptionCodeService krStockSubscriptionService;
+    private final StockSubscriptionService krStockSubscriptionService;
     private final ReactorNettyWebSocketClient webSocketClient;
     private final WebClient.Builder webClientBuilder;
     private final KrStockProperties properties;

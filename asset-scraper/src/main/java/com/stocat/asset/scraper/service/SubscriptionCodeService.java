@@ -10,7 +10,6 @@ import com.stocat.asset.scraper.dto.MarketInfo;
 import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import java.util.List;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import reactor.core.publisher.Flux;
@@ -19,11 +18,10 @@ import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Redis의 구독 코드를 관리하고 변경 사항을 전파하는 공통 서비스입니다. Crypto와 Stock 등 자산군별로 Bean을 생성하여 사용합니다.
+ * Redis의 구독 코드를 관리하고 변경 사항을 전파하는 공통 서비스입니다.
  */
 @Slf4j
-@RequiredArgsConstructor
-public class SubscriptionCodeService {
+public abstract class SubscriptionCodeService {
 
     private final ReactiveStringRedisTemplate redisTemplate;
     private final AssetsRepository assetsRepository;
@@ -36,6 +34,23 @@ public class SubscriptionCodeService {
     private final AssetsCategory assetsCategory;
 
     private final Sinks.Many<List<String>> sink = Sinks.many().replay().latest();
+
+    protected SubscriptionCodeService(
+            ReactiveStringRedisTemplate redisTemplate,
+            AssetsRepository assetsRepository,
+            ObjectMapper mapper,
+            String subscribeKey,
+            String hotKey,
+            String tradeChannel,
+            AssetsCategory assetsCategory) {
+        this.redisTemplate = redisTemplate;
+        this.assetsRepository = assetsRepository;
+        this.mapper = mapper;
+        this.subscribeKey = subscribeKey;
+        this.hotKey = hotKey;
+        this.tradeChannel = tradeChannel;
+        this.assetsCategory = assetsCategory;
+    }
 
     /**
      * Redis에서 리스트를 다시 읽어 와서 구독 Flux에 푸시합니다.

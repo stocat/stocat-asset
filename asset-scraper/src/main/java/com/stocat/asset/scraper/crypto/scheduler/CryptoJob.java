@@ -2,7 +2,7 @@ package com.stocat.asset.scraper.crypto.scheduler;
 
 import com.stocat.asset.scraper.crypto.config.UpbitApiProperties;
 import com.stocat.asset.scraper.crypto.service.UpbitCryptoMarketProvider;
-import com.stocat.asset.scraper.service.SubscriptionCodeService;
+import com.stocat.asset.scraper.crypto.service.CryptoSubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CryptoJob {
 
-    private final SubscriptionCodeService cryptoSubscriptionService;
+    private final CryptoSubscriptionService cryptoSubscriptionService;
     private final UpbitCryptoMarketProvider upbitCryptoMarketProvider;
     private final UpbitApiProperties upbitApiProperties;
 
