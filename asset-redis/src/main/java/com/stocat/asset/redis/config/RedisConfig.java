@@ -2,12 +2,13 @@ package com.stocat.asset.redis.config;
 
 import com.stocat.asset.redis.constants.CryptoKeys;
 import com.stocat.asset.redis.constants.ExchangeRateKeys;
-import com.stocat.asset.redis.constants.StockKeys;
+import com.stocat.asset.redis.constants.KrStockKeys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -20,14 +21,13 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.ReactiveRedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Redis 연결 설정을 담당합니다.
  */
 @Slf4j
 @Configuration
-@EnableAutoConfiguration(exclude = { RedisAutoConfiguration.class, RedisReactiveAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, RedisReactiveAutoConfiguration.class})
 public class RedisConfig {
 
     @Bean
@@ -100,6 +100,6 @@ public class RedisConfig {
 
     @Bean
     public ChannelTopic krStockTradesTopic() {
-        return new ChannelTopic(StockKeys.STOCK_TRADES);
+        return new ChannelTopic(KrStockKeys.KR_STOCK_TRADES);
     }
 }

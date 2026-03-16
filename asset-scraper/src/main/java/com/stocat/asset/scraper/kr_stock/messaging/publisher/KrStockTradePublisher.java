@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.mysql.domain.asset.domain.Currency;
-import com.stocat.asset.redis.constants.StockKeys;
+import com.stocat.asset.redis.constants.KrStockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import com.stocat.asset.scraper.messaging.event.TradeSide;
@@ -243,7 +243,7 @@ public class KrStockTradePublisher {
             }
 
             return Flux.fromIterable(parseTradeInfo(code, data))
-                    .flatMap(tradeInfo -> subscriptionCodeService.publishTrades(tradeInfo, StockKeys.STOCK_TRADES))
+                    .flatMap(tradeInfo -> subscriptionCodeService.publishTrades(tradeInfo, KrStockKeys.KR_STOCK_TRADES))
                     .then();
 
         } catch (Exception e) {

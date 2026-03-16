@@ -1,7 +1,7 @@
 package com.stocat.asset.scraper.kr_stock.scheduler;
 
 import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
-import com.stocat.asset.redis.constants.StockKeys;
+import com.stocat.asset.redis.constants.KrStockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.kr_stock.service.StockMarketProvider;
 import com.stocat.asset.scraper.service.SubscriptionCodeService;
@@ -33,12 +33,12 @@ public class KrStockJob {
                 .flatMap(dailyCodesSet ->
                         subscriptionCodeService.refreshHotAndSubscribeCodes(
                                         dailyCodesSet,
-                                        StockKeys.STOCK_HOT_CODES,
-                                        StockKeys.STOCK_SUBSCRIBE_CODES,
+                                        KrStockKeys.KR_STOCK_HOT_CODES,
+                                        KrStockKeys.KR_STOCK_SUBSCRIBE_CODES,
                                         AssetsCategory.KOR_STOCK
                                 )
                                 .then(subscriptionCodeService.reloadCodes(
-                                        StockKeys.STOCK_SUBSCRIBE_CODES,
+                                        KrStockKeys.KR_STOCK_SUBSCRIBE_CODES,
                                         AssetsCategory.KOR_STOCK
                                 ))
                                 .doOnError(e -> log.error("Redis 구독 코드 갱신 또는 리로드 중 오류 발생", e))
