@@ -1,5 +1,7 @@
 package com.stocat.asset.scraper.kr_stock.scheduler;
 
+import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
+import com.stocat.asset.redis.constants.StockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.kr_stock.service.StockMarketProvider;
 import com.stocat.asset.scraper.service.SubscriptionCodeService;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class KrStockJob {
 
-    private final SubscriptionCodeService krStockSubscriptionService;
+    private final SubscriptionCodeService subscriptionCodeService;
     private final StockMarketProvider stockMarketProvider;
     private final KrStockProperties properties;
 
@@ -29,8 +31,16 @@ public class KrStockJob {
         stockMarketProvider.getTargetStocks(properties.getSubscribeLimit())
                 .doOnError(e -> log.error("한국 주식 종목 선정 중 오류 발생", e))
                 .flatMap(dailyCodesSet ->
-                        krStockSubscriptionService.refreshHotAndSubscribeCodes(dailyCodesSet)
-                                .then(krStockSubscriptionService.reloadCodes())
+                        subscriptionCodeService.refreshHotAndSubscribeCodes(
+                                        dailyCodesSet,
+                                        StockKeys.STOCK_HOT_CODES,
+                                        StockKeys.STOCK_SUBSCRIBE_CODES,
+                                        AssetsCategory.KOR_STOCK
+                                )
+                                .then(subscriptionCodeService.reloadCodes(
+                                        StockKeys.STOCK_SUBSCRIBE_CODES,
+                                        AssetsCategory.KOR_STOCK
+                                ))
                                 .doOnError(e -> log.error("Redis 구독 코드 갱신 또는 리로드 중 오류 발생", e))
                 )
                 .doOnError(error -> log.error("한국 주식 구독 코드 갱신 파이프라인 최종 실패", error))

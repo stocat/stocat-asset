@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.mysql.domain.asset.domain.Currency;
+import com.stocat.asset.redis.constants.StockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import com.stocat.asset.scraper.messaging.event.TradeSide;
-import com.stocat.asset.scraper.kr_stock.service.StockSubscriptionService;
+import com.stocat.asset.scraper.service.SubscriptionCodeService;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -63,7 +65,7 @@ public class KrStockTradePublisher {
      */
     private static final int IDX_BID_SIZE_1 = 33;
 
-    private final StockSubscriptionService krStockSubscriptionService;
+    private final SubscriptionCodeService subscriptionCodeService;
     private final ReactorNettyWebSocketClient webSocketClient;
     private final WebClient.Builder webClientBuilder;
     private final KrStockProperties properties;
@@ -92,7 +94,7 @@ public class KrStockTradePublisher {
                 .baseUrl(kis.getAuthBaseUrl())
                 .build();
 
-        krStockSubscriptionService.codeFlux()
+        subscriptionCodeService.codeFlux(AssetsCategory.KOR_STOCK)
                 .distinctUntilChanged()
                 .switchMap(symbols -> this.subscribeSymbols(symbols)
                         .onErrorResume(error -> {
@@ -241,7 +243,7 @@ public class KrStockTradePublisher {
             }
 
             return Flux.fromIterable(parseTradeInfo(code, data))
-                    .flatMap(krStockSubscriptionService::publishTrades)
+                    .flatMap(tradeInfo -> subscriptionCodeService.publishTrades(tradeInfo, StockKeys.STOCK_TRADES))
                     .then();
 
         } catch (Exception e) {

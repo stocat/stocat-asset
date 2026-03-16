@@ -9,9 +9,12 @@ import com.stocat.asset.mysql.domain.asset.repository.AssetsRepository;
 import com.stocat.asset.scraper.dto.MarketInfo;
 import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -21,41 +24,34 @@ import reactor.core.scheduler.Schedulers;
  * Redis의 구독 코드를 관리하고 변경 사항을 전파하는 공통 서비스입니다.
  */
 @Slf4j
-public abstract class SubscriptionCodeService {
+@Service
+public class SubscriptionCodeService {
 
     private final ReactiveStringRedisTemplate redisTemplate;
     private final AssetsRepository assetsRepository;
     private final ObjectMapper mapper;
 
-    // 자산군별 설정 필드
-    private final String subscribeKey;
-    private final String hotKey;
-    private final String tradeChannel;
-    private final AssetsCategory assetsCategory;
+    private final Map<AssetsCategory, Sinks.Many<List<String>>> sinks = new ConcurrentHashMap<>();
 
-    private final Sinks.Many<List<String>> sink = Sinks.many().replay().latest();
-
-    protected SubscriptionCodeService(
+    public SubscriptionCodeService(
             ReactiveStringRedisTemplate redisTemplate,
             AssetsRepository assetsRepository,
-            ObjectMapper mapper,
-            String subscribeKey,
-            String hotKey,
-            String tradeChannel,
-            AssetsCategory assetsCategory) {
+            ObjectMapper mapper) {
         this.redisTemplate = redisTemplate;
         this.assetsRepository = assetsRepository;
         this.mapper = mapper;
-        this.subscribeKey = subscribeKey;
-        this.hotKey = hotKey;
-        this.tradeChannel = tradeChannel;
-        this.assetsCategory = assetsCategory;
+    }
+
+    private Sinks.Many<List<String>> getSink(AssetsCategory category) {
+        return sinks.computeIfAbsent(category, k -> Sinks.many().replay().latest());
     }
 
     /**
      * Redis에서 리스트를 다시 읽어 와서 구독 Flux에 푸시합니다.
      */
-    public Mono<Void> reloadCodes() {
+    public Mono<Void> reloadCodes(String subscribeKey, AssetsCategory assetsCategory) {
+        Sinks.Many<List<String>> sink = getSink(assetsCategory);
+
         return redisTemplate.opsForSet()
                 .members(subscribeKey)
                 .collectList()
@@ -70,14 +66,15 @@ public abstract class SubscriptionCodeService {
     /**
      * 구독 코드가 로드될 때마다 리스트를 방출하는 Flux.
      */
-    public Flux<List<String>> codeFlux() {
-        return sink.asFlux();
+    public Flux<List<String>> codeFlux(AssetsCategory assetsCategory) {
+        return getSink(assetsCategory).asFlux();
     }
 
     /**
      * DB에 자산 정보를 저장하고 Redis 키를 갱신합니다.
      */
-    public Mono<Void> refreshHotAndSubscribeCodes(Set<MarketInfo> targetSymbols) {
+    public Mono<Void> refreshHotAndSubscribeCodes(Set<MarketInfo> targetSymbols, String hotKey, String subscribeKey,
+                                                  AssetsCategory assetsCategory) {
         // 1. DB 저장 작업 (블로킹 작업이므로 별도 스레드에서 수행)
         Mono<Void> dbTask = Mono.fromRunnable(() -> {
             List<AssetsEntity> newAssets = targetSymbols.stream()
@@ -98,14 +95,15 @@ public abstract class SubscriptionCodeService {
             String[] codes = targetSymbols.stream()
                     .map(MarketInfo::code)
                     .toArray(String[]::new);
-            return updateRedisKeys(codes);
+            return updateRedisKeys(codes, hotKey, subscribeKey, assetsCategory);
         });
 
         // 3. 두 작업을 동시에 실행하고, 둘 다 끝나면 종료
         return Mono.when(dbTask, redisTask);
     }
 
-    private Mono<Void> updateRedisKeys(String[] codes) {
+    private Mono<Void> updateRedisKeys(String[] codes, String hotKey, String subscribeKey,
+                                       AssetsCategory assetsCategory) {
         return redisTemplate.delete(hotKey)
                 .then(redisTemplate.opsForSet().add(hotKey, codes))
                 .then(redisTemplate.opsForSet().add(subscribeKey, codes))
@@ -118,7 +116,7 @@ public abstract class SubscriptionCodeService {
     /**
      * TradeDto를 JSON으로 직렬화하여 Redis 채널에 발행합니다.
      */
-    public Mono<Long> publishTrades(TradeInfo dto) {
+    public Mono<Long> publishTrades(TradeInfo dto, String tradeChannel) {
         try {
             String json = mapper.writeValueAsString(dto);
             log.debug("Redis 퍼블리시 준비 - channel={}, payload={}", tradeChannel, json);
