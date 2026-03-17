@@ -1,20 +1,21 @@
-package com.stocat.asset.scraper.kr_stock.service;
+package com.stocat.asset.scraper.kr_stock.messaging.publisher;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.mysql.domain.asset.domain.Currency;
+import com.stocat.asset.redis.constants.KrStockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.messaging.event.TradeInfo;
 import com.stocat.asset.scraper.messaging.event.TradeSide;
+import com.stocat.asset.scraper.service.SubscriptionCodeService;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KrStockTickStreamSubscriber {
+public class KrStockTradePublisher {
 
     private static final String APPROVAL_ENDPOINT = "/oauth2/Approval";
     /**
@@ -64,8 +65,7 @@ public class KrStockTickStreamSubscriber {
      */
     private static final int IDX_BID_SIZE_1 = 33;
 
-    private final KrStockRedisPublisher publisher;
-    private final KrStockSubscriptionService subscriptionService;
+    private final SubscriptionCodeService subscriptionCodeService;
     private final ReactorNettyWebSocketClient webSocketClient;
     private final WebClient.Builder webClientBuilder;
     private final KrStockProperties properties;
@@ -94,8 +94,7 @@ public class KrStockTickStreamSubscriber {
                 .baseUrl(kis.getAuthBaseUrl())
                 .build();
 
-        subscriptionService.codeFlux()
-                .map(symbols -> symbols.stream().limit(properties.getSubscribeLimit()).toList())
+        subscriptionCodeService.codeFlux(AssetsCategory.KOR_STOCK)
                 .distinctUntilChanged()
                 .switchMap(symbols -> this.subscribeSymbols(symbols)
                         .onErrorResume(error -> {
@@ -244,7 +243,7 @@ public class KrStockTickStreamSubscriber {
             }
 
             return Flux.fromIterable(parseTradeInfo(code, data))
-                    .flatMap(publisher::publishTrade)
+                    .flatMap(tradeInfo -> subscriptionCodeService.publishTrades(tradeInfo, KrStockKeys.KR_STOCK_TRADES))
                     .then();
 
         } catch (Exception e) {
