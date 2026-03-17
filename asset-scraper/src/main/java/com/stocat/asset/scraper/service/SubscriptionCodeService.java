@@ -74,7 +74,7 @@ public class SubscriptionCodeService {
      * DB에 자산 정보를 저장하고 Redis 키를 갱신합니다.
      */
     public Mono<Void> refreshHotAndSubscribeCodes(Set<MarketInfo> targetSymbols, String hotKey, String subscribeKey,
-                                                  AssetsCategory assetsCategory) {
+                                                  AssetsCategory assetsCategory, Currency currency) {
         // 1. DB 저장 작업 (블로킹 작업이므로 별도 스레드에서 수행)
         Mono<Void> dbTask = Mono.fromRunnable(() -> {
             List<AssetsEntity> newAssets = targetSymbols.stream()
@@ -83,7 +83,7 @@ public class SubscriptionCodeService {
                             info.koreanName(),
                             info.englishName(),
                             assetsCategory,
-                            Currency.KRW)
+                            currency)
                     )
                     .toList();
             assetsRepository.saveAll(newAssets);

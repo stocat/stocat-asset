@@ -4,6 +4,7 @@ import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.redis.constants.KrStockKeys;
 import com.stocat.asset.scraper.kr_stock.config.KrStockProperties;
 import com.stocat.asset.scraper.kr_stock.service.StockMarketProvider;
+import com.stocat.asset.mysql.domain.asset.domain.Currency;
 import com.stocat.asset.scraper.service.SubscriptionCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,8 @@ public class KrStockJob {
                                         dailyCodesSet,
                                         KrStockKeys.KR_STOCK_HOT_CODES,
                                         KrStockKeys.KR_STOCK_SUBSCRIBE_CODES,
-                                        AssetsCategory.KOR_STOCK
+                                        AssetsCategory.KOR_STOCK,
+                                        Currency.KRW
                                 )
                                 .then(subscriptionCodeService.reloadCodes(
                                         KrStockKeys.KR_STOCK_SUBSCRIBE_CODES,

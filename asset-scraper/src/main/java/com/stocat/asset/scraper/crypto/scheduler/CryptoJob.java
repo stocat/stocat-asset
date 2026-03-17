@@ -4,6 +4,7 @@ import com.stocat.asset.mysql.domain.asset.domain.AssetsCategory;
 import com.stocat.asset.redis.constants.CryptoKeys;
 import com.stocat.asset.scraper.crypto.config.UpbitApiProperties;
 import com.stocat.asset.scraper.crypto.service.UpbitCryptoMarketProvider;
+import com.stocat.asset.mysql.domain.asset.domain.Currency;
 import com.stocat.asset.scraper.service.SubscriptionCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,8 @@ public class CryptoJob {
                                         dailyCodesSet,
                                         CryptoKeys.CRYPTO_HOT_CODES,
                                         CryptoKeys.CRYPTO_SUBSCRIBE_CODES,
-                                        AssetsCategory.CRYPTO
+                                        AssetsCategory.CRYPTO,
+                                        Currency.KRW
                                 )
                                 .then(subscriptionCodeService.reloadCodes(
                                         CryptoKeys.CRYPTO_SUBSCRIBE_CODES,
